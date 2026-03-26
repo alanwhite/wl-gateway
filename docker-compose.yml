@@ -1,0 +1,40 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: wl-gateway
+    restart: unless-stopped
+    ports:
+      - "8443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/sites:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/cloudflare-ips.conf:/etc/nginx/conf.d/cloudflare-ips.conf:ro
+      - ./nginx/cloudflare-origin-pull-ca.pem:/etc/nginx/certs/cloudflare-origin-pull-ca.pem:ro
+    networks:
+      - gateway
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  cloudflare-updater:
+    image: alpine:latest
+    container_name: wl-gateway-cloudflare-updater
+    restart: unless-stopped
+    volumes:
+      - ./nginx/update-cloudflare-ips.sh:/update.sh:ro
+      - ./nginx/cloudflare-ips.conf:/data/cloudflare-ips.conf
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_CONTAINER=wl-gateway
+    entrypoint: /bin/sh
+    command: -c 'apk add --no-cache docker-cli && sh /update.sh && while true; do sleep 86400; sh /update.sh; done'
+    networks:
+      - gateway
+
+networks:
+  gateway:
+    name: wl-gateway
+    driver: bridge
