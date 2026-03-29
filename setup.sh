@@ -8,6 +8,7 @@ echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SSL_DIR="${SCRIPT_DIR}/nginx/ssl"
+mkdir -p "$SSL_DIR"
 
 # ── 1. Generate self-signed fallback cert ───────────────────────────────────
 

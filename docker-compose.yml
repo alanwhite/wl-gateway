@@ -37,4 +37,4 @@ services:
 networks:
   gateway:
     name: wl-gateway
-    driver: bridge
+    external: true
