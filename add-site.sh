@@ -22,7 +22,7 @@ if [[ $# -lt 2 ]]; then
   echo "  container-name  The Docker container name (e.g. client-alpha-app)"
   echo ""
   echo "Current sites:"
-  for f in "${SITES_DIR}"/*.conf 2>/dev/null; do
+  for f in "${SITES_DIR}"/*.conf; do
     [[ -f "$f" ]] || continue
     site_domain=$(basename "$f" .conf)
     echo "  $site_domain"
