@@ -35,7 +35,19 @@ CONTAINER="$2"
 SAFE_NAME=$(echo "$DOMAIN" | tr '.' '_' | tr '-' '_')
 CONF_FILE="${SITES_DIR}/${DOMAIN}.conf"
 
-# ── Validation ──────────────────────────────────────────────────────────────
+# ── Input validation ───────────────────────────────────────────────────────
+
+if [[ ! "$DOMAIN" =~ ^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$ ]]; then
+  echo "Error: Invalid domain format: $DOMAIN"
+  exit 1
+fi
+
+if [[ ! "$CONTAINER" =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]*$ ]]; then
+  echo "Error: Invalid container name format: $CONTAINER"
+  exit 1
+fi
+
+# ── Uniqueness validation ──────────────────────────────────────────────────
 
 if [[ -f "$CONF_FILE" ]]; then
   echo "Error: Config already exists at ${CONF_FILE}"
