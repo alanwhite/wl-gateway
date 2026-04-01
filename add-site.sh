@@ -128,7 +128,7 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
     # Rate limiting
-    limit_req zone=general_limit burst=30 nodelay;
+    limit_req zone=general_limit burst=60 nodelay;
     limit_conn conn_limit 20;
 
     # Block common exploit paths
