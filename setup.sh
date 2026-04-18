@@ -28,7 +28,11 @@ fi
 if docker network inspect wl-gateway &>/dev/null; then
   echo "✓ Docker network 'wl-gateway' already exists"
 else
-  docker network create wl-gateway
+  docker network create \
+    --ipv6 \
+    --subnet 172.19.0.0/16 \
+    --subnet fd12:3456:789a:3::/64 \
+    wl-gateway
   echo "✓ Created Docker network 'wl-gateway'"
 fi
 
