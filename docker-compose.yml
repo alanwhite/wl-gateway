@@ -11,6 +11,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./nginx/cloudflare-ips.conf:/etc/nginx/conf.d/cloudflare-ips.conf:ro
       - ./nginx/cloudflare-origin-pull-ca.pem:/etc/nginx/certs/cloudflare-origin-pull-ca.pem:ro
+      - ./nginx/html:/etc/nginx/html:ro
     networks:
       - gateway
     healthcheck:
