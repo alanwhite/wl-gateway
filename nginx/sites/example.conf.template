@@ -7,7 +7,7 @@
 #   3. Container connected to the wl-gateway network
 
 upstream app_SAFENAME {
-    server CONTAINER-app:3000;
+    server CONTAINER-app:3000 max_fails=3 fail_timeout=3s;
 }
 
 server {
@@ -63,29 +63,12 @@ server {
     }
 
     # Custom error page when app is down
-    error_page 502 503 504 /maintenance.html;
-    location = /maintenance.html {
-        root /etc/nginx/html;
-        internal;
-    }
+    # Friendly maintenance page when upstream is down
+    include /etc/nginx/sites/_snippets/wl-app-maintenance.conf;
 
     # Main proxy
     location / {
         proxy_pass http://app_SAFENAME;
-        proxy_http_version 1.1;
-
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        # WebSocket support (Next.js HMR)
-        proxy_set_header Upgrade    $http_upgrade;
-        proxy_set_header Connection "upgrade";
-
-        # Timeouts
-        proxy_connect_timeout 10s;
-        proxy_send_timeout 30s;
-        proxy_read_timeout 30s;
+        include /etc/nginx/sites/_snippets/wl-app-proxy.conf;
     }
 }

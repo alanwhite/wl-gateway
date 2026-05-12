@@ -92,7 +92,7 @@ fi
 
 cat > "$CONF_FILE" <<EOF
 upstream app_${SAFE_NAME} {
-    server ${CONTAINER}:3000;
+    server ${CONTAINER}:3000 max_fails=3 fail_timeout=3s;
 }
 
 server {
@@ -147,24 +147,12 @@ server {
         access_log off;
     }
 
-    # Main proxy
+    # Friendly maintenance page when upstream is down
+    include /etc/nginx/sites/_snippets/wl-app-maintenance.conf;
+
     location / {
         proxy_pass http://app_${SAFE_NAME};
-        proxy_http_version 1.1;
-
-        proxy_set_header Host              \$host;
-        proxy_set_header X-Real-IP         \$remote_addr;
-        proxy_set_header X-Forwarded-For   \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-
-        # WebSocket support
-        proxy_set_header Upgrade    \$http_upgrade;
-        proxy_set_header Connection "upgrade";
-
-        # Timeouts
-        proxy_connect_timeout 10s;
-        proxy_send_timeout 30s;
-        proxy_read_timeout 30s;
+        include /etc/nginx/sites/_snippets/wl-app-proxy.conf;
     }
 }
 EOF
